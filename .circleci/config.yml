@@ -21,18 +21,18 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
-      - restore_cache:
-          keys:
-            - go-mod-v4-{{ checksum "go.sum" }}
+#      - restore_cache:
+#          keys:
+#            - go-mod-v4-{{ checksum "go.sum" }}
       - run:
           name: Install Dependencies
           command: |
             go mod download
             go install github.com/mattn/goveralls@latest
-      - save_cache:
-          key: go-mod-v4-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
+#      - save_cache:
+#          key: go-mod-v4-{{ checksum "go.sum" }}
+#          paths:
+#            - "/go/pkg/mod"
       - run:
           name: Run tests
           command: |
