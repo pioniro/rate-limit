@@ -1,4 +1,9 @@
 # Rate Limiter for Go
+[![Go Reference](https://pkg.go.dev/badge/github.com/pioniro/rate-limit.svg)](https://pkg.go.dev/github.com/pioniro/rate-limit)
+[![Build status](https://img.shields.io/circleci/build/github/pioniro/rate-limit?style=plastic)](https://app.circleci.com/pipelines/github/pioniro/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/pioniro/rate-limit)](https://goreportcard.com/report/github.com/pioniro/rate-limit)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/pioniro/rate-limit/blob/main/LICENSE)
+[![Coverage](https://coveralls.io/repos/github/pioniro/rate-limit/badge.svg?branch=main)](https://coveralls.io/github/pioniro/rate-limit)
 
 A flexible and extensible rate limiting library for Go applications, providing various rate limiting algorithms and storage backends.
 
