@@ -28,6 +28,8 @@ type Bucket struct {
 type InMemoryStorage struct {
 	buckets         map[string]Bucket
 	mu              sync.RWMutex
+	locks           map[string]*sync.Mutex
+	locksMu         sync.Mutex
 	cleanupInterval time.Duration
 	stopCleanup     chan struct{}
 }
@@ -37,6 +39,8 @@ func NewInMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{
 		buckets:         make(map[string]Bucket),
 		mu:              sync.RWMutex{},
+		locks:           make(map[string]*sync.Mutex),
+		locksMu:         sync.Mutex{},
 		cleanupInterval: DefaultCleanupInterval,
 		stopCleanup:     make(chan struct{}),
 	}
@@ -196,4 +200,47 @@ func (s *InMemoryStorage) startCleanupCycle(ctx context.Context) {
 			return
 		}
 	}
+}
+
+// Lock acquires a lock for the given key.
+func (s *InMemoryStorage) Lock(ctx context.Context, key string) (bool, error) {
+	// Check context cancellation
+	select {
+	case <-ctx.Done():
+		return false, fmt.Errorf("context canceled during lock operation: %w", ctx.Err())
+	default:
+	}
+
+	s.locksMu.Lock()
+	mutex, exists := s.locks[key]
+	if !exists {
+		mutex = &sync.Mutex{}
+		s.locks[key] = mutex
+	}
+	s.locksMu.Unlock()
+
+	// Try to acquire the lock
+	mutex.Lock()
+	return true, nil
+}
+
+// Unlock releases a lock for the given key.
+func (s *InMemoryStorage) Unlock(ctx context.Context, key string) error {
+	// Check context cancellation
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("context canceled during unlock operation: %w", ctx.Err())
+	default:
+	}
+
+	s.locksMu.Lock()
+	mutex, exists := s.locks[key]
+	s.locksMu.Unlock()
+
+	if !exists {
+		return fmt.Errorf("tried to unlock a non-existent lock for key: %s", key)
+	}
+
+	mutex.Unlock()
+	return nil
 }

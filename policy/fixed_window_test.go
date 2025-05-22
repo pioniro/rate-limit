@@ -17,7 +17,7 @@ func TestFixedWindowLimiter_Consume(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a limiter with 10 tokens per minute
-	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store, nil)
+	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store)
 	if err != nil {
 		t.Fatalf("Failed to create limiter: %v", err)
 	}
@@ -76,7 +76,7 @@ func TestFixedWindowLimiter_ConsumeOutsideInterval(t *testing.T) {
 
 	// Use a shorter interval for testing
 	testInterval := 5 * time.Second
-	limiter, err := NewFixedWindowLimiter("test", 10, testInterval, store, nil)
+	limiter, err := NewFixedWindowLimiter("test", 10, testInterval, store)
 	if err != nil {
 		t.Fatalf("Failed to create limiter: %v", err)
 	}
@@ -133,7 +133,7 @@ func TestFixedWindowLimiter_PeekConsume(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a limiter with 10 tokens per minute
-	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store, nil)
+	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store)
 	if err != nil {
 		t.Fatalf("Failed to create limiter: %v", err)
 	}
@@ -195,7 +195,7 @@ func TestFixedWindowLimiter_InvalidToken(t *testing.T) {
 	store := storage.NewInMemoryStorage()
 
 	// Create a limiter with 10 tokens per minute
-	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store, nil)
+	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store)
 	if err != nil {
 		t.Fatalf("Failed to create limiter: %v", err)
 	}
@@ -215,7 +215,7 @@ func TestFixedWindowLimiter_WindowReset(t *testing.T) {
 
 	// Use a short interval for testing
 	interval := 2 * time.Second
-	limiter, err := NewFixedWindowLimiter("test", 5, interval, store, nil)
+	limiter, err := NewFixedWindowLimiter("test", 5, interval, store)
 	if err != nil {
 		t.Fatalf("Failed to create limiter: %v", err)
 	}
@@ -286,7 +286,7 @@ func TestFixedWindowLimiter_MalformedWindowFromStorage(t *testing.T) {
 	}
 
 	// Create a limiter
-	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store, nil)
+	limiter, err := NewFixedWindowLimiter("test", 10, time.Minute, store)
 	if err != nil {
 		t.Fatalf("Failed to create limiter: %v", err)
 	}

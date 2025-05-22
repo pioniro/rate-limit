@@ -24,15 +24,15 @@ type Storage interface {
 	Save(ctx context.Context, state State) error
 	Fetch(ctx context.Context, stateID string) (*State, error)
 	Delete(ctx context.Context, stateID string) error
+
+	// Mutex-like functionality
+
+	Lock(ctx context.Context, key string) (bool, error)
+	Unlock(ctx context.Context, key string) error
 }
 
 type State struct {
 	ID        string
 	Data      map[string]interface{} // Store additional data
 	ExpiresAt time.Time
-}
-
-type Mutex interface {
-	Lock(ctx context.Context) (bool, error)
-	Unlock(ctx context.Context) error
 }

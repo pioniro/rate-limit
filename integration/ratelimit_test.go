@@ -23,7 +23,7 @@ func TestRateLimiterInterface(t *testing.T) {
 		{
 			name: "FixedWindowLimiter",
 			limiter: func() ratelimit.RateLimit {
-				l, err := policy.NewFixedWindowLimiter("test-fixed", 5, time.Minute, store, nil)
+				l, err := policy.NewFixedWindowLimiter("test-fixed", 5, time.Minute, store)
 				if err != nil {
 					t.Fatalf("Failed to create FixedWindowLimiter: %v", err)
 				}
@@ -79,7 +79,7 @@ func TestRateLimiterUsagePattern(t *testing.T) {
 	store := storage.NewInMemoryStorage()
 
 	// Create a rate limiter with a low limit and short interval for testing
-	limiter, err := policy.NewFixedWindowLimiter("test-usage", 3, 100*time.Millisecond, store, nil)
+	limiter, err := policy.NewFixedWindowLimiter("test-usage", 3, 100*time.Millisecond, store)
 	if err != nil {
 		t.Fatalf("Failed to create limiter: %v", err)
 	}

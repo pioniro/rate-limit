@@ -103,7 +103,6 @@ type FixedWindowLimiter struct {
 	limit    int
 	interval time.Duration
 	storage  ratelimit.Storage
-	mu       ratelimit.Mutex
 }
 
 // NewFixedWindowLimiter creates a new fixed window limiter.
@@ -112,7 +111,6 @@ func NewFixedWindowLimiter(
 	limit int,
 	interval time.Duration,
 	storage ratelimit.Storage,
-	mutex ratelimit.Mutex,
 ) (*FixedWindowLimiter, error) {
 	if limit < 1 {
 		return nil, ErrLimitTooSmall
@@ -123,7 +121,6 @@ func NewFixedWindowLimiter(
 		limit:    limit,
 		interval: interval,
 		storage:  storage,
-		mu:       mutex,
 	}, nil
 }
 
@@ -135,19 +132,17 @@ func (f *FixedWindowLimiter) Reserve(ctx context.Context, key string, tokens int
 
 	stateID := f.id + ":" + key
 
-	// Try to acquire lock if provided
-	if f.mu != nil {
-		locked, err := f.mu.Lock(ctx)
-		if err != nil {
-			return ratelimit.Reservation{}, fmt.Errorf("failed to acquire lock: %w", err)
-		}
-		if !locked {
-			return ratelimit.Reservation{}, ErrFailedToAcquireLock
-		}
-		defer func() {
-			_ = f.mu.Unlock(ctx) // ignoring error on unlock
-		}()
+	// Try to acquire lock from storage
+	locked, err := f.storage.Lock(ctx, stateID)
+	if err != nil {
+		return ratelimit.Reservation{}, fmt.Errorf("failed to acquire lock: %w", err)
 	}
+	if !locked {
+		return ratelimit.Reservation{}, ErrFailedToAcquireLock
+	}
+	defer func() {
+		_ = f.storage.Unlock(ctx, stateID) // ignoring error on unlock
+	}()
 
 	// Check for context cancellation
 	select {

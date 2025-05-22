@@ -9,6 +9,7 @@ A flexible and extensible rate limiting library for Go applications, providing v
 - [Quick Start](#quick-start)
 - [Rate Limiting Policies](#rate-limiting-policies)
   - [Fixed Window](#fixed-window)
+  - [Token Bucket](#token-bucket)
   - [No Limiter](#no-limiter)
 - [Storage Backends](#storage-backends)
   - [In-Memory Storage](#in-memory-storage)
@@ -22,6 +23,7 @@ A flexible and extensible rate limiting library for Go applications, providing v
 
 - Multiple rate limiting algorithms:
   - Fixed Window: Limits requests within a fixed time window
+  - Token Bucket: Allows burst traffic while maintaining a long-term rate limit
   - No Limiter: A pass-through limiter that allows all operations (useful for testing or conditional rate limiting)
 - Pluggable storage backends:
   - In-memory storage with automatic cleanup and configurable expiration
@@ -134,6 +136,36 @@ limiter, err := policy.NewFixedWindowLimiter(
     nil,             // no mutex
 )
 ```
+
+### Token Bucket
+
+The Token Bucket algorithm models a bucket that is continuously refilled with tokens at a fixed rate. Each request consumes one or more tokens from the bucket. If the bucket has enough tokens, the request is allowed; otherwise, it's denied.
+
+```go
+// Create a rate of 10 tokens per minute
+rate := policy.PerMinute(10)
+
+// Or use other predefined rates
+// rate := policy.PerSecond(1)
+// rate := policy.PerHour(100)
+// rate := policy.PerDay(1000)
+
+// Or create a custom rate
+// rate := policy.NewRate(30 * time.Second, 5) // 5 tokens every 30 seconds
+
+// Create a token bucket limiter with a maximum burst of 20 tokens
+limiter, err := policy.NewTokenBucketLimiter(
+    "api",           // limiter ID
+    20,              // burst size (maximum tokens)
+    rate,            // refill rate
+    store,           // storage backend
+)
+```
+
+The Token Bucket algorithm is ideal for:
+- Handling burst traffic while maintaining a long-term rate limit
+- APIs that need to allow occasional spikes in usage
+- Scenarios where you want to smooth out traffic rather than enforce strict windows
 
 ### No Limiter
 
@@ -276,10 +308,13 @@ The test suite includes:
 
 This project is actively maintained. The current focus is on:
 
-1. Adding more rate limiting algorithms (Token Bucket, Sliding Window)
+1. Adding more rate limiting algorithms (Sliding Window)
 2. Implementing additional storage backends (Redis, Database)
 3. Improving performance and scalability
 4. Enhancing documentation and examples
+
+Recent updates:
+- Added Token Bucket algorithm implementation
 
 ## License
 
