@@ -27,5 +27,5 @@ jobs:
       run: |
         go install github.com/mattn/goveralls@latest
         mkdir -p /tmp/test-reports
-        go test -v -cover -race -coverprofile=/tmp/test-reports/coverage.out
+        go test -v -cover -race -coverprofile=/tmp/test-reports/coverage.out ./...
         goveralls -coverprofile=/tmp/test-reports/coverage.out -service=github
