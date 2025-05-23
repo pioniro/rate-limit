@@ -68,13 +68,12 @@ func main() {
 	defer store.Stop()
 
 	// Create a fixed window rate limiter
-	// Parameters: id, limit, interval, storage, mutex (optional)
+	// Parameters: id, limit, interval, storage
 	limiter, err := policy.NewFixedWindowLimiter(
 		"login", // limiter ID
 		10,      // limit (10 requests)
 		15*time.Minute, // interval (15 minutes)
 		store,   // storage backend
-		nil,     // no mutex for this example
 	)
 	if err != nil {
 		panic(err)
@@ -138,7 +137,6 @@ limiter, err := policy.NewFixedWindowLimiter(
     100,             // limit (100 requests)
     time.Hour,       // interval (1 hour)
     store,           // storage backend
-    nil,             // no mutex
 )
 ```
 
@@ -274,13 +272,6 @@ type Storage interface {
     Save(ctx context.Context, state State) error
     Fetch(ctx context.Context, stateId string) (*State, error)
     Delete(ctx context.Context, stateId string) error
-}
-```
-
-#### Mutex
-
-```go
-type Mutex interface {
     Lock(ctx context.Context) (bool, error)
     Unlock(ctx context.Context) error
 }
