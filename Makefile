@@ -19,7 +19,7 @@ check: tidy fmt tests ## Run all project checks
 .PHONY: tests
 tests: ## Run tests
 	@echo "### Tests"
-	go test -v ./...
+	go test -v -race ./...
 
 .PHONY: tidy
 tidy: ## Tidy go modules
